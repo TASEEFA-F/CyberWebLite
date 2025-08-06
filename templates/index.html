@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CyberSec Toolkit | Security Toolkit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-blue: #0ff0fc;
+      --neon-purple: #9600ff;
+      --neon-pink: #ff00f6;
+      --dark-bg: #0a0a12;
+      --darker-bg: #050508;
+      --panel-bg: rgba(15, 15, 25, 0.8);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--dark-bg);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(150, 0, 255, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(0, 255, 252, 0.15) 0%, transparent 30%);
+    }
+
+    .sidebar {
+      width: 240px;
+      background: var(--darker-bg);
+      border-right: 1px solid rgba(100, 100, 150, 0.2);
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar button {
+      background: none;
+      border: none;
+      font-size: 0.95rem;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      color: #a0a0c0;
+      cursor: pointer;
+      font-family: 'Share Tech Mono', monospace;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar button:hover,
+    .sidebar button.active {
+      background: rgba(150, 0, 255, 0.2);
+      color: var(--neon-blue);
+      text-shadow: 0 0 5px rgba(0, 255, 252, 0.3);
+    }
+
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .panel {
+      display: none;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .panel.active { display: block; }
+
+    form {
+      background: var(--panel-bg);
+      border: 1px solid rgba(100, 100, 150, 0.2);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      margin-bottom: 3rem;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+    }
+
+    h2 {
+      color: var(--neon-blue);
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2::before {
+      content: '>>';
+      color: var(--neon-pink);
+      font-family: 'Share Tech Mono', monospace;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(10, 10, 20, 0.7);
+      border: 1px solid #2a2a4a;
+      border-radius: 4px;
+      color: white;
+      font-family: 'Share Tech Mono', monospace;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+      color: black;
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    pre {
+      background: rgba(0, 5, 15, 0.7);
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.875rem;
+      border-left: 3px solid var(--neon-purple);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+      color: var(--neon-blue);
+      text-shadow: 0 0 5px rgba(0, 255, 252, 0.3);
+      max-width: 100%;
+    }
+
+    .success { color: #00ffaa; text-shadow: 0 0 5px rgba(0, 255, 170, 0.5); }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <button class="{% if request.form.get('panel') == 'recon' or not request.form %}active{% endif %}" onclick="showPanel('recon')">🧭 RECON TOOLS</button>
+    <button class="{% if request.form.get('panel') == 'crypto' %}active{% endif %}" onclick="showPanel('crypto')">🔐 ENCRYPTION</button>
+    <button class="{% if request.form.get('panel') == 'stego' %}active{% endif %}" onclick="showPanel('stego')">🖼️ STEGANOGRAPHY</button>
+  </div>
+
+  <div class="main">
+
+    <!-- Recon Panel -->
+    <div class="panel {% if request.form.get('panel') == 'recon' or not request.form %}active{% endif %}" id="recon">
+      <form method="POST">
+        <input type="hidden" name="panel" value="recon">
+        <h2>SUBDOMAIN SCANNER</h2>
+        <input type="text" name="domain" placeholder="example.com" required>
+        <button name="action" value="subdomain">SCAN</button>
+      </form>
+      {% if result and request.form.get('action') == 'subdomain' %}
+        <div><h2><span class="success">// SCAN RESULTS</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="panel" value="recon">
+        <h2>PORT SCANNER</h2>
+        <input type="text" name="target" placeholder="scanme.nmap.org" required>
+        <button name="action" value="portscan">SCAN</button>
+      </form>
+      {% if result and request.form.get('action') == 'portscan' %}
+        <div><h2><span class="success">// SCAN RESULTS</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+    </div>
+
+    <!-- Encryption Panel -->
+    <div class="panel {% if request.form.get('panel') == 'crypto' %}active{% endif %}" id="crypto">
+      <form method="POST">
+        <input type="hidden" name="panel" value="crypto">
+        <h2>ENCRYPT MESSAGE</h2>
+        <input type="text" name="message" placeholder="Your message..." required>
+        <button name="action" value="encrypt">ENCRYPT</button>
+      </form>
+      {% if result and request.form.get('action') == 'encrypt' %}
+        <div><h2><span class="success">// OUTPUT</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+
+      <form method="POST">
+        <input type="hidden" name="panel" value="crypto">
+        <h2>DECRYPT MESSAGE</h2>
+        <input type="text" name="enc_message" placeholder="Encrypted string" required>
+        <input type="text" name="enc_key" placeholder="Fernet key" required>
+        <button name="action" value="decrypt">DECRYPT</button>
+      </form>
+      {% if result and request.form.get('action') == 'decrypt' %}
+        <div><h2><span class="success">// OUTPUT</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+    </div>
+
+    <!-- Steganography Panel -->
+    <div class="panel {% if request.form.get('panel') == 'stego' %}active{% endif %}" id="stego">
+      <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="panel" value="stego">
+        <h2>HIDE TEXT IN IMAGE</h2>
+        <input type="file" name="image" required>
+        <input type="text" name="msg_to_hide" placeholder="Message to hide..." required>
+        <button name="action" value="hide">HIDE</button>
+      </form>
+      {% if result and request.form.get('action') == 'hide' %}
+        <div><h2><span class="success">// OUTPUT</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="panel" value="stego">
+        <h2>EXTRACT TEXT FROM IMAGE</h2>
+        <input type="file" name="stego_image" required>
+        <button name="action" value="extract">EXTRACT</button>
+      </form>
+      {% if result and request.form.get('action') == 'extract' %}
+        <div><h2><span class="success">// OUTPUT</span></h2><pre>{{ result }}</pre></div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <script>
+    const activePanel = "{{ request.form.get('panel') or 'recon' }}";
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(activePanel)?.classList.add('active');
+
+    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = Array.from(document.querySelectorAll('.sidebar button')).find(btn =>
+      btn.textContent.toLowerCase().includes(activePanel)
+    );
+    if (activeBtn) activeBtn.classList.add('active');
+
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+      const clicked = Array.from(document.querySelectorAll('.sidebar button')).find(btn =>
+        btn.textContent.toLowerCase().includes(id)
+      );
+      if (clicked) clicked.classList.add('active');
+    }
+  </script>
+</body>
+</html>
